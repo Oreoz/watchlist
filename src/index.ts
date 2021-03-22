@@ -1,13 +1,20 @@
 import moment from "moment";
-import { CARD_NAME, DATE, EDITION, MARKET_PRICE, TREND } from "./data/headers";
+import {
+  CARD_NAME,
+  DATE,
+  EDITION,
+  FOIL,
+  MARKET_PRICE,
+  TREND,
+} from "./data/headers";
 import { getNamedCardData } from "./http/scryfall";
-import { initSpreadsheet } from "./sheets";
+import { initializeSpreadsheet } from "./sheets";
 import { wait } from "./utils";
 
 const SCRYFALL_THROTTLE = 1000;
 
 (async () => {
-  const doc = await initSpreadsheet();
+  const doc = await initializeSpreadsheet();
 
   const sheet = doc.sheetsByIndex[0];
   const rows = await sheet.getRows();
@@ -23,7 +30,7 @@ const SCRYFALL_THROTTLE = 1000;
 
     const { usd, foil_usd } = data;
 
-    const foil = row["Foil"] === "Yes";
+    const foil = row[FOIL] === "Yes";
 
     const currentPrice = Number(foil ? foil_usd : usd);
     const previousPrice = Number(row[MARKET_PRICE]);

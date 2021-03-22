@@ -1,6 +1,6 @@
 import { GoogleSpreadsheet } from "google-spreadsheet";
 
-export async function initSpreadsheet() {
+export async function initializeSpreadsheet() {
   const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID ?? "");
 
   await doc.useServiceAccountAuth({
