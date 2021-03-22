@@ -1,6 +1,6 @@
 import { GoogleSpreadsheet } from "google-spreadsheet";
 
-export async function initSpreadsheetAndGetRows() {
+export async function initSpreadsheet() {
   const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID ?? "");
 
   await doc.useServiceAccountAuth({
@@ -10,6 +10,5 @@ export async function initSpreadsheetAndGetRows() {
 
   await doc.loadInfo();
 
-  const sheet = doc.sheetsByIndex[0];
-  return await sheet.getRows();
+  return doc;
 }

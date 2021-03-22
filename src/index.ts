@@ -1,13 +1,16 @@
 import moment from "moment";
 import { CARD_NAME, DATE, EDITION, MARKET_PRICE, TREND } from "./data/headers";
 import { getNamedCardData } from "./http/scryfall";
-import { initSpreadsheetAndGetRows } from "./sheets";
+import { initSpreadsheet } from "./sheets";
 import { wait } from "./utils";
 
 const SCRYFALL_THROTTLE = 1000;
 
 (async () => {
-  const rows = await initSpreadsheetAndGetRows();
+  const doc = await initSpreadsheet();
+
+  const sheet = doc.sheetsByIndex[0];
+  const rows = await sheet.getRows();
 
   const formattedDate = moment().format("DD-MM-YYYY");
 
