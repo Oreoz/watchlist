@@ -1,21 +1,41 @@
+import moment from "moment";
+import { CARD_NAME, DATE, EDITION, MARKET_PRICE, TREND } from "./data/headers";
 import { getNamedCardData } from "./http/scryfall";
+import { initSpreadsheetAndGetRows } from "./sheets";
 import { wait } from "./utils";
 
-// TODO: Grab that from the spreadsheet.
-const cards = [
-  { name: "Tainted Pact", set: "ODY" },
-  { name: "Nature's Will", set: "CHK" },
-  { name: "Tarmogoyf", set: "TSR" },
-];
+const SCRYFALL_THROTTLE = 1000;
 
 (async () => {
-  for (let index = 0; index < cards.length; index++) {
-    const { name, set } = cards[index];
+  const rows = await initSpreadsheetAndGetRows();
 
-    const { usd, usd_foil } = await getNamedCardData(name, set);
+  const formattedDate = moment().format("DD-MM-YYYY");
 
-    console.log("Response", { usd, usd_foil });
+  for (let index = 0; index < rows.length; index++) {
+    const row = rows[index];
 
-    await wait(1000);
+    const data = await getNamedCardData(row[CARD_NAME], row[EDITION]);
+
+    if (!data) continue;
+
+    const { usd, foil_usd } = data;
+
+    const foil = row["Foil"] === "Yes";
+
+    const currentPrice = Number(foil ? foil_usd : usd);
+    const previousPrice = Number(row[MARKET_PRICE]);
+
+    row[MARKET_PRICE] = currentPrice;
+    row[DATE] = formattedDate;
+    row[TREND] =
+      currentPrice > previousPrice
+        ? "up"
+        : currentPrice < previousPrice
+        ? "down"
+        : "same";
+
+    row.save();
+
+    await wait(SCRYFALL_THROTTLE);
   }
 })();

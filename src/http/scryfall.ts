@@ -3,7 +3,9 @@ import fetch from "node-fetch";
 const url = "https://api.scryfall.com";
 
 export async function getNamedCardData(name: string, set: string) {
-  const destination = `${url}/cards/named?exact=${name}&set=${set}`;
+  const encodedName = encodeURIComponent(name);
+
+  const destination = `${url}/cards/named?exact=${encodedName}&set=${set}`;
 
   const res = await fetch(destination);
 

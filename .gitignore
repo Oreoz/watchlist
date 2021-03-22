@@ -1,2 +1,6 @@
+.DS_Store
+.env
+private.json
+
 dist
 node_modules
