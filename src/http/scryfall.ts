@@ -22,8 +22,6 @@ export async function getCardData({ name, number, set }: Options) {
 
   const res = await fetch(destination);
 
-  console.log("GET", destination, "-", res.status);
-
   if (res.ok) {
     const json = await res.json();
     return json.prices;
