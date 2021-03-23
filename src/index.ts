@@ -37,6 +37,15 @@ const SCRYFALL_THROTTLE = 1000;
 
     const trend = determineTrend(currentPrice, marketPrice);
 
+    switch (trend) {
+      case "up":
+        console.log(name, "📈");
+        break;
+      case "down":
+        console.log(name, "📉");
+        break;
+    }
+
     row[Headers.Trend] = trend;
 
     row.save();
