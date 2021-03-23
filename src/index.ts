@@ -39,11 +39,13 @@ const SCRYFALL_THROTTLE = 1000;
 
     switch (trend) {
       case "up":
-        console.log(name, "📈");
+        console.log(name, "📈", marketPrice);
         break;
       case "down":
-        console.log(name, "📉");
+        console.log(name, "📉", marketPrice);
         break;
+      default:
+        console.log(name, "✋", marketPrice);
     }
 
     row[Headers.Trend] = trend;
