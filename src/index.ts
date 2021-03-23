@@ -1,15 +1,8 @@
 import moment from "moment";
-import {
-  CARD_NAME,
-  DATE,
-  EDITION,
-  FOIL,
-  MARKET_PRICE,
-  TREND,
-} from "./data/headers";
-import { getNamedCardData } from "./http/scryfall";
+import Headers from "./data/headers";
+import { getCardData } from "./http/scryfall";
 import { initializeSpreadsheet } from "./sheets";
-import { wait } from "./utils";
+import { determineTrend, wait } from "./utils";
 
 const SCRYFALL_THROTTLE = 1000;
 
@@ -24,25 +17,27 @@ const SCRYFALL_THROTTLE = 1000;
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index];
 
-    const data = await getNamedCardData(row[CARD_NAME], row[EDITION]);
+    const name = row[Headers.CardName];
+    const set = row[Headers.Edition];
+    const number = row[Headers.Number];
+
+    const data = await getCardData({ name, number, set });
 
     if (!data) continue;
 
-    const { usd, foil_usd } = data;
+    const { usd, usd_foil } = data;
 
-    const foil = row[FOIL] === "Yes";
+    const wantsTheShinies = row[Headers.Foil] === "Yes";
 
-    const currentPrice = Number(foil ? foil_usd : usd);
-    const previousPrice = Number(row[MARKET_PRICE]);
+    const marketPrice = Number(wantsTheShinies ? usd_foil : usd);
+    const currentPrice = Number(row[Headers.MarketPrice]);
 
-    row[MARKET_PRICE] = currentPrice;
-    row[DATE] = formattedDate;
-    row[TREND] =
-      currentPrice > previousPrice
-        ? "up"
-        : currentPrice < previousPrice
-        ? "down"
-        : "same";
+    row[Headers.Date] = formattedDate;
+    row[Headers.MarketPrice] = marketPrice;
+
+    const trend = determineTrend(currentPrice, marketPrice);
+
+    row[Headers.Trend] = trend;
 
     row.save();
 

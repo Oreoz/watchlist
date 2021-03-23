@@ -1,6 +1,11 @@
-export const CARD_NAME = "Card Name";
-export const DATE = "Date";
-export const EDITION = "Edition";
-export const FOIL = "Foil";
-export const MARKET_PRICE = "Market Price";
-export const TREND = "Trend";
+const Headers = {
+  CardName: "Card Name",
+  Date: "Date",
+  Edition: "Edition",
+  Foil: "Foil",
+  MarketPrice: "Market Price",
+  Number: "Number",
+  Trend: "Trend",
+};
+
+export default Headers;
