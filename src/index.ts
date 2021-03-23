@@ -18,12 +18,21 @@ const SCRYFALL_THROTTLE = 1000;
     const row = rows[index];
 
     const name = row[Headers.CardName];
+
+    if (formattedDate === row[Headers.Date]) {
+      // Only update prices once per day. 🧠
+      continue;
+    }
+
     const set = row[Headers.Edition];
     const number = row[Headers.Number];
 
     const data = await getCardData({ name, number, set });
 
-    if (!data) continue;
+    if (!data) {
+      console.log(`Unable to get card data for ${name}, check your spreadsheet. 🤷‍♂️`);
+      continue;
+    }
 
     const { usd, usd_foil } = data;
 
