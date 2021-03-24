@@ -1,4 +1,6 @@
 import moment from "moment";
+import { RowBuilder } from "./builders/row";
+import { outputTrend } from "./console";
 import Headers from "./data/headers";
 import { getCardData } from "./http/scryfall";
 import { initializeSpreadsheet } from "./sheets";
@@ -12,7 +14,7 @@ const SCRYFALL_THROTTLE = 1000;
   const sheet = doc.sheetsByIndex[0];
   const rows = await sheet.getRows();
 
-  const formattedDate = moment().format("DD-MM-YYYY");
+  const formattedDate = moment().format("DD-MM-YYYY A");
 
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index];
@@ -41,25 +43,15 @@ const SCRYFALL_THROTTLE = 1000;
     const marketPrice = Number(wantsTheShinies ? usd_foil : usd);
     const currentPrice = Number(row[Headers.MarketPrice]);
 
-    row[Headers.Date] = formattedDate;
-    row[Headers.MarketPrice] = marketPrice;
-
     const trend = determineTrend(currentPrice, marketPrice);
 
-    switch (trend) {
-      case "up":
-        console.log(name, "📈", marketPrice);
-        break;
-      case "down":
-        console.log(name, "📉", marketPrice);
-        break;
-      default:
-        console.log(name, "✋", marketPrice);
-    }
+    outputTrend(trend, { name, marketPrice });
 
-    row[Headers.Trend] = trend;
-
-    row.save();
+    new RowBuilder(row)
+      .set(Headers.Trend, trend)
+      .set(Headers.Date, formattedDate)
+      .set(Headers.MarketPrice, marketPrice)
+      .build();
 
     await wait(SCRYFALL_THROTTLE);
   }
