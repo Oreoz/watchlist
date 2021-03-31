@@ -3,17 +3,22 @@ import { Trend } from "../types/trend";
 interface Data {
   name: string;
   marketPrice: number;
+  set: string;
 }
 
-export const outputTrend = (trend: Trend, { name, marketPrice }: Data) => {
+export const outputTrend = (trend: Trend, { name, marketPrice, set }: Data) => {
+  let emoji = "";
+
   switch (trend) {
     case "up":
-      console.log(name, "📈", marketPrice);
+      emoji = "📈";
       break;
     case "down":
-      console.log(name, "📉", marketPrice);
+      emoji = "📉";
       break;
     default:
-      console.log(name, "✋", marketPrice);
+      emoji = "✋";
   }
+
+  console.log(`${name} (${set}) ${emoji} ${marketPrice}`);
 };

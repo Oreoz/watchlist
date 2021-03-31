@@ -45,7 +45,7 @@ const SCRYFALL_THROTTLE = 1000;
 
     const trend = determineTrend(currentPrice, marketPrice);
 
-    outputTrend(trend, { name, marketPrice });
+    outputTrend(trend, { name, marketPrice, set });
 
     new RowBuilder(row)
       .set(Headers.Trend, trend)
