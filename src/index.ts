@@ -19,7 +19,7 @@ const SCRYFALL_THROTTLE = 1000;
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index];
 
-    const name = row[Headers.CardName];
+    let name = row[Headers.CardName];
 
     if (formattedDate === row[Headers.Date]) {
       // Only update prices once per day. 🧠
@@ -37,6 +37,7 @@ const SCRYFALL_THROTTLE = 1000;
     }
 
     const { usd, usd_foil } = data;
+    name = data.name; // Set name if we don't have it yet.
 
     const wantsTheShinies = row[Headers.Foil] === "Yes";
 
@@ -48,9 +49,10 @@ const SCRYFALL_THROTTLE = 1000;
     outputTrend(trend, { name, marketPrice, set });
 
     new RowBuilder(row)
+      .set(Headers.CardName, name)
       .set(Headers.Trend, trend)
       .set(Headers.Date, formattedDate)
-      .set(Headers.MarketPrice, marketPrice)
+      .set(Headers.MarketPrice, marketPrice.toFixed(2))
       .build();
 
     await wait(SCRYFALL_THROTTLE);

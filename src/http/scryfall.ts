@@ -24,7 +24,7 @@ export async function getCardData({ name, number, set }: Options) {
 
   if (res.ok) {
     const json = await res.json();
-    return json.prices;
+    return { name: json.name, ...json.prices };
   }
 
   return null;
