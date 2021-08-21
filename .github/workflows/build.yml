@@ -17,6 +17,7 @@ jobs:
       with:
         node-version: 16.x
 
-    - run: |
+    - name: install & build
+      run: |
         npm i
         npm run build
