@@ -7,7 +7,8 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon -r dotenv/config dist/index.js",
-    "start": "npm run build && node -r dotenv/config dist/index.js"
+    "start": "npm run build && node -r dotenv/config dist/index.js",
+    "start:actions": "npm run build && node dist/index.js"
   },
   "author": "",
   "license": "ISC",
