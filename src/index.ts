@@ -6,7 +6,9 @@ import { getCardData } from "./http/scryfall";
 import { initializeSpreadsheet } from "./sheets";
 import { determineTrend, wait } from "./utils";
 
-const SCRYFALL_THROTTLE = 1000;
+// Google API has a maximum of 1 write request per second
+// Scryfall asks for a maximum of 10 calls per seconds
+const API_DELAY = 1000;
 
 (async () => {
   const doc = await initializeSpreadsheet();
@@ -14,7 +16,7 @@ const SCRYFALL_THROTTLE = 1000;
   const sheet = doc.sheetsByIndex[0];
   const rows = await sheet.getRows();
 
-  const formattedDate = moment().format("DD-MM-YYYY A");
+  const formattedDate = moment().format("DD-MM-YYYY");
 
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index];
@@ -55,6 +57,6 @@ const SCRYFALL_THROTTLE = 1000;
       .set(Headers.MarketPrice, marketPrice.toFixed(2))
       .build();
 
-    await wait(SCRYFALL_THROTTLE);
+    await wait(API_DELAY);
   }
 })();
