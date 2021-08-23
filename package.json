@@ -1,17 +1,16 @@
 {
   "name": "watchlist",
   "version": "1.0.0",
-  "description": "Tool that watches prices of stuff on my watchlist.",
+  "author": "Oreoz",
+  "license": "MIT",
+  "description": "Tool that automatically keeps my cards prices up to date.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon -r dotenv/config dist/index.js",
-    "start": "npm run build && node -r dotenv/config dist/index.js",
-    "start:actions": "npm run build && node dist/index.js"
+    "start": "npm run build && node -r dotenv/config dist/index.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@types/google-spreadsheet": "^3.1.5",
     "@types/node": "^16.7.0",
