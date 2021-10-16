@@ -1,13 +1,14 @@
 import moment from "moment";
 import { RowBuilder } from "./builders/row";
-import { outputTrend } from "./console";
 import Headers from "./data/headers";
 import { getCardData } from "./http/scryfall";
 import { initializeSpreadsheet } from "./sheets";
-import { determineTrend, wait } from "./utils";
+import { determineTrend, EmojiMap, wait } from "./utils";
 
-// Google API has a maximum of 1 write request per second
-// Scryfall asks for a maximum of 10 calls per seconds
+/**
+ * Google API has a maximum of 1 write request per second
+ * Scryfall asks for a maximum of 10 calls per seconds
+ */
 const API_DELAY = 1000;
 
 (async () => {
@@ -21,8 +22,6 @@ const API_DELAY = 1000;
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index];
 
-    let name = row[Headers.CardName];
-
     if (formattedDate === row[Headers.Date]) {
       // Only update prices once per day. 🧠
       continue;
@@ -31,15 +30,16 @@ const API_DELAY = 1000;
     const set = row[Headers.Edition];
     const number = row[Headers.Number];
 
-    const data = await getCardData({ name, number, set });
+    const data = await getCardData(set, number);
 
     if (!data) {
-      console.log(`Unable to get card data for ${name}, check your spreadsheet. 🤷‍♂️`);
+      console.log(
+        `Unable to get card data for ${set}-${number}, double-check your spreadsheet. 🤷‍♂️`
+      );
       continue;
     }
 
-    const { usd, usd_foil } = data;
-    name = data.name; // Set name if we don't have it yet.
+    const { name, usd, usd_foil } = data;
 
     const wantsTheShinies = row[Headers.Foil] === "Yes";
 
@@ -48,7 +48,7 @@ const API_DELAY = 1000;
 
     const trend = determineTrend(currentPrice, marketPrice);
 
-    outputTrend(trend, { name, marketPrice, set });
+    console.log(`${name} (${set}) ${EmojiMap[trend]} ${marketPrice}`);
 
     new RowBuilder(row)
       .set(Headers.CardName, name)
