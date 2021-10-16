@@ -1,4 +1,10 @@
-import { Trend } from "../types/trend";
+export type Trend = "up" | "down" | "same";
+
+export const EmojiMap: Record<Trend, string> = {
+  up: "📈",
+  down: "📉",
+  same: "✋",
+};
 
 export const determineTrend = (currentPrice: number, newPrice: number): Trend => {
   if (newPrice > currentPrice) return "up";

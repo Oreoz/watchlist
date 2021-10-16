@@ -2,25 +2,10 @@ import fetch from "node-fetch";
 
 const url = "https://api.scryfall.com";
 
-interface Options {
-  name: string;
-  number: string;
-  set: string;
-}
-
-export async function getCardData({ name, number, set }: Options) {
+export async function getCardData(set: string, number: string) {
   const normalizedSet = set.toLowerCase();
 
-  let destination = url;
-
-  if (number) {
-    destination += `/cards/${normalizedSet}/${number}`;
-  } else {
-    const encodedName = encodeURIComponent(name);
-    destination += `/cards/named?exact=${encodedName}&set=${normalizedSet}`;
-  }
-
-  const res = await fetch(destination);
+  const res = await fetch(`${url}/cards/${normalizedSet}/${number}`);
 
   if (res.ok) {
     const json = await res.json();
