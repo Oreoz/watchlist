@@ -11,6 +11,8 @@ import { determineTrend, EmojiMap, wait } from "./utils";
  */
 const API_DELAY = 1000;
 
+type Foil = "Yes" | "No" | "Etched";
+
 (async () => {
   const doc = await initializeSpreadsheet();
 
@@ -27,6 +29,7 @@ const API_DELAY = 1000;
       continue;
     }
 
+    const foil: Foil = row[Headers.Foil];
     const set = row[Headers.Edition];
     const number = row[Headers.Number];
 
@@ -39,11 +42,15 @@ const API_DELAY = 1000;
       continue;
     }
 
-    const { name, usd, usd_foil } = data;
+    const { name, usd, usd_foil, usd_etched } = data;
 
-    const wantsTheShinies = row[Headers.Foil] === "Yes";
+    const priceMap: Record<Foil, number | undefined> = {
+      Yes: usd_foil,
+      No: usd,
+      Etched: usd_etched,
+    };
 
-    const marketPrice = Number(wantsTheShinies ? usd_foil : usd);
+    const marketPrice = Number(priceMap[foil]);
     const currentPrice = Number(row[Headers.MarketPrice]);
 
     const trend = determineTrend(currentPrice, marketPrice);
