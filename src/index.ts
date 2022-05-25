@@ -1,69 +1,55 @@
-import moment from "moment";
-import { RowBuilder } from "./builders/row";
-import Headers from "./data/headers";
-import { getCardData } from "./http/scryfall";
-import { initializeSpreadsheet } from "./sheets";
-import { determineTrend, EmojiMap, wait } from "./utils";
+import { GoogleSpreadsheet } from "google-spreadsheet";
+import { CardUpdater } from "./card-updater";
+import { wait } from "./utils";
 
 /**
- * Google API has a maximum of 1 write request per second
- * Scryfall asks for a maximum of 10 calls per seconds
+ * Google API has a maximum of 60 read/writes requests per minute (1/sec).
+ * Scryfall asks for a maximum of 10 calls per seconds.
  */
 const API_DELAY = 1000;
 
-type Foil = "Yes" | "No" | "Etched";
+/**
+ * Since we're allowed 10 requests per seconds on Scryfall, we going to
+ * update prices in 10 card chunks to not exceed the 1 request per second
+ * limit on the Google Sheets API.
+ */
+const BATCH_SIZE = 10;
 
 (async () => {
-  const doc = await initializeSpreadsheet();
+  const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID ?? "");
+
+  await doc.useServiceAccountAuth({
+    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ?? "",
+    private_key: process.env.GOOGLE_PRIVATE_KEY ?? "",
+  });
+
+  await doc.loadInfo();
 
   const sheet = doc.sheetsByIndex[0];
-  const rows = await sheet.getRows();
 
-  const formattedDate = moment().format("DD-MM-YYYY");
+  let currentRowIndex = 1;
+  let done = false;
 
-  for (let index = 0; index < rows.length; index++) {
-    const row = rows[index];
+  while (!done) {
+    const sheetsThrottle = wait(API_DELAY);
+    await sheet.loadCells(`A${currentRowIndex}:H${currentRowIndex + BATCH_SIZE}`);
 
-    if (formattedDate === row[Headers.Date]) {
-      // Only update prices once per day. 🧠
-      continue;
+    const updater = new CardUpdater(sheet);
+
+    for (let i = 0; i < BATCH_SIZE; i++) {
+      try {
+        await updater.update(currentRowIndex + i);
+      } catch (error) {
+        done = true;
+        break;
+      }
     }
 
-    const foil: Foil = row[Headers.Foil];
-    const set = row[Headers.Edition];
-    const number = row[Headers.Number];
+    await sheet.saveUpdatedCells();
+    await sheetsThrottle;
 
-    const data = await getCardData(set, number);
+    if (done) break;
 
-    if (!data) {
-      console.log(
-        `Unable to get card data for ${set}-${number}, double-check your spreadsheet. 🤷‍♂️`
-      );
-      continue;
-    }
-
-    const { name, usd, usd_foil, usd_etched } = data;
-
-    const priceMap: Record<Foil, number | undefined> = {
-      Yes: usd_foil,
-      No: usd,
-      Etched: usd_etched,
-    };
-
-    const marketPrice = Number(priceMap[foil]);
-    const currentPrice = Number(row[Headers.MarketPrice]);
-
-    const trend = determineTrend(currentPrice, marketPrice);
-
-    console.log(`${name} (${set}) ${EmojiMap[trend]} ${marketPrice}`);
-
-    new RowBuilder(row)
-      .set(Headers.CardName, name)
-      .set(Headers.Trend, trend)
-      .set(Headers.Date, formattedDate)
-      .set(Headers.MarketPrice, marketPrice.toFixed(2))
-      .build();
-
-    await wait(API_DELAY);
+    currentRowIndex += BATCH_SIZE;
   }
 })();
