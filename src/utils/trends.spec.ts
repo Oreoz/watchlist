@@ -1,23 +1,24 @@
-import { determineTrend } from ".";
+import { determineTrend } from "./trends";
 
 describe("trends", () => {
-  describe("determineTrend", () => {
-    it("identifies an increase in price", () => {
-      const result = determineTrend(1, 2);
-
-      expect(result).toBe("up");
+  describe("up", () => {
+    it("works", () => {
+      const res = determineTrend(0, 1);
+      expect(res).toBe("📈");
     });
+  });
 
-    it("identifies a decrease in price", () => {
-      const result = determineTrend(2, 1);
-
-      expect(result).toBe("down");
+  describe("down", () => {
+    it("works", () => {
+      const res = determineTrend(1, 0);
+      expect(res).toBe("📉");
     });
+  });
 
-    it("identifies same prices", () => {
-      const result = determineTrend(1, 1);
-
-      expect(result).toBe("same");
+  describe("flat", () => {
+    it("works", () => {
+      const res = determineTrend(1, 1);
+      expect(res).toBe("✋");
     });
   });
 });
