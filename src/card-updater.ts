@@ -59,6 +59,5 @@ export class CardUpdater {
     dateCell.value = today;
     nameCell.value = json.name;
     priceCell.value = updatedPrice;
-    priceCell.numberFormat = { type: "CURRENCY", pattern: '"$"#,##0.00' };
   }
 }
