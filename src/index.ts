@@ -25,31 +25,32 @@ const BATCH_SIZE = 10;
 
   await doc.loadInfo();
 
-  const sheet = doc.sheetsByIndex[0];
+  for (let sheetIndex = 0; sheetIndex < doc.sheetCount; sheetIndex++) {
+    const sheet = doc.sheetsByIndex[sheetIndex];
+    let currentRowIndex = 1;
+    let done = false;
 
-  let currentRowIndex = 1;
-  let done = false;
+    while (!done) {
+      const sheetsThrottle = wait(API_DELAY);
+      await sheet.loadCells(`A${currentRowIndex}:H${currentRowIndex + BATCH_SIZE}`);
 
-  while (!done) {
-    const sheetsThrottle = wait(API_DELAY);
-    await sheet.loadCells(`A${currentRowIndex}:H${currentRowIndex + BATCH_SIZE}`);
+      const updater = new CardUpdater(sheet);
 
-    const updater = new CardUpdater(sheet);
-
-    for (let i = 0; i < BATCH_SIZE; i++) {
-      try {
-        await updater.update(currentRowIndex + i);
-      } catch (error) {
-        done = true;
-        break;
+      for (let i = 0; i < BATCH_SIZE; i++) {
+        try {
+          await updater.update(currentRowIndex + i);
+        } catch (error) {
+          done = true;
+          break;
+        }
       }
+
+      await sheet.saveUpdatedCells();
+      await sheetsThrottle;
+
+      if (done) break;
+
+      currentRowIndex += BATCH_SIZE;
     }
-
-    await sheet.saveUpdatedCells();
-    await sheetsThrottle;
-
-    if (done) break;
-
-    currentRowIndex += BATCH_SIZE;
   }
 })();
