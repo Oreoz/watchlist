@@ -9,7 +9,7 @@ import { wait } from "./utils";
 const API_DELAY = 1000;
 
 /**
- * Since we're allowed 10 requests per seconds on Scryfall, we going to
+ * Since we're allowed 10 requests per seconds on Scryfall, we're going to
  * update prices in 10 card chunks to not exceed the 1 request per second
  * limit on the Google Sheets API.
  */
