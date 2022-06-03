@@ -1,14 +1,20 @@
 import { GoogleSpreadsheetWorksheet } from "google-spreadsheet";
-import { getCardData } from "./http/scryfall";
-import { determineTrend } from "./utils";
+import { get } from "./scryfall";
+import { determineTrend, Trend } from "./utils";
 
 type Foil = "Yes" | "No" | "Etched";
 type Price = "usd_foil" | "usd" | "usd_etched";
 
-const priceMap: Record<Foil, Price> = {
+const prices: Record<Foil, Price> = {
   Yes: "usd_foil",
   No: "usd",
   Etched: "usd_etched",
+};
+
+const emojis: Record<Trend, string> = {
+  up: "📈",
+  down: "📉",
+  same: "✋",
 };
 
 const Rows = {
@@ -22,7 +28,7 @@ const Rows = {
   trend: 7,
 };
 
-const today = new Date().toLocaleDateString("en-CA");
+const timestamp = new Date().toLocaleDateString("en-CA");
 
 export class CardUpdater {
   worksheet: GoogleSpreadsheetWorksheet;
@@ -38,12 +44,13 @@ export class CardUpdater {
     const numberCell = this.worksheet.getCell(row, Rows.number);
     const priceCell = this.worksheet.getCell(row, Rows.price);
     const setCell = this.worksheet.getCell(row, Rows.set);
+    const trendCell = this.worksheet.getCell(row, Rows.trend);
 
     if (!setCell.value || !numberCell.value) {
       throw new Error("Looks like the current row is empty.");
     }
 
-    const res = await getCardData(String(setCell.value), String(numberCell.value));
+    const res = await get(String(setCell.value), String(numberCell.value));
 
     if (!res.ok) {
       throw new Error("Couldn't fetch the card data from Scryfall.");
@@ -51,12 +58,16 @@ export class CardUpdater {
 
     const json = await res.json();
 
-    const updatedPrice = Number(json.prices[priceMap[foilCell.value as Foil]]) ?? 0;
+    const updatedPrice = Number(json.prices[prices[foilCell.value as Foil]]) ?? 0;
     const trend = determineTrend(Number(priceCell.value), updatedPrice);
 
-    console.log(`${json.name} - ${updatedPrice} ${trend}`);
+    console.log(`${json.name} - ${updatedPrice} ${emojis[trend]}`);
 
-    dateCell.value = today;
+    if (dateCell.value !== timestamp) {
+      dateCell.value = timestamp;
+      trendCell.value = trend;
+    }
+
     nameCell.value = json.name;
     priceCell.value = updatedPrice;
   }
