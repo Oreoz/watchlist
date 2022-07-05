@@ -19,7 +19,7 @@
     "dotenv": "^16.0.1",
     "google-spreadsheet": "^3.3.0",
     "node-fetch": "^2.6.7",
-    "nodemon": "^2.0.18",
+    "nodemon": "^2.0.19",
     "typescript": "^4.7.4"
   },
   "devDependencies": {
