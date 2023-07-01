@@ -1,3 +1,4 @@
+import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { CardUpdater } from "./card-updater";
 import { wait } from "./utils";
@@ -15,14 +16,26 @@ const API_DELAY = 1000;
  */
 const BATCH_SIZE = 10;
 
+/**
+ * Create the google service account credentials that we'll use in order
+ * to acces our spreadsheet. This leverages information that we store in
+ * our .env file.
+ */
+const serviceAccountCredentials = new JWT({
+  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  key: process.env.GOOGLE_PRIVATE_KEY,
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+/**
+ * The spreadsheet that we will be manipulating during this script.
+ */
+const doc = new GoogleSpreadsheet(
+  process.env.SPREADSHEET_ID ?? "",
+  serviceAccountCredentials
+);
+
 (async () => {
-  const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID ?? "");
-
-  await doc.useServiceAccountAuth({
-    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ?? "",
-    private_key: process.env.GOOGLE_PRIVATE_KEY ?? "",
-  });
-
   await doc.loadInfo();
 
   for (let sheetIndex = 0; sheetIndex < doc.sheetCount; sheetIndex++) {
