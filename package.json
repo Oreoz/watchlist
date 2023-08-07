@@ -4,6 +4,9 @@
   "license": "MIT",
   "description": "Tool that automatically keeps my cards prices up to date.",
   "main": "dist/index.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
@@ -13,11 +16,9 @@
   },
   "dependencies": {
     "@types/node": "^20.4.8",
-    "@types/node-fetch": "^2.6.4",
     "dotenv": "^16.3.1",
     "google-auth-library": "^8.9.0",
     "google-spreadsheet": "^4.0.0",
-    "node-fetch": "^2.6.12",
     "nodemon": "^3.0.1"
   },
   "devDependencies": {
