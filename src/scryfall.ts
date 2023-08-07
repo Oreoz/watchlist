@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 /**
  * Get data for a single card given its set code and collector number.
  *
