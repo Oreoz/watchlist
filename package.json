@@ -5,7 +5,7 @@
   "description": "Tool that automatically keeps my cards prices up to date.",
   "main": "dist/index.js",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
