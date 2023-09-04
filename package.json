@@ -8,8 +8,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc -w",
+    "build": "tsc --project tsconfig.build.json",
+    "build:watch": "tsc --project tsconfig.build.json --watch",
     "dev": "nodemon -r dotenv/config dist/index.js",
     "start": "npm run build && node -r dotenv/config dist/index.js",
     "test": "vitest"
