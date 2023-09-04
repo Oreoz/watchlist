@@ -1,10 +1,23 @@
 import { get } from "./scryfall";
-import fetch from "jest-fetch-mock";
+import { setupServer } from "msw/node";
+import { rest } from "msw";
+
+const server = setupServer();
 
 describe("scryfall", () => {
-  describe("get", () => {
+  beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+
+  afterAll(() => server.close());
+
+  afterEach(() => server.resetHandlers());
+
+  describe("get request", () => {
     it("works", async () => {
-      fetch.mockResponseOnce(JSON.stringify({ name: "Tarmogoyf" }));
+      server.use(
+        rest.get("https://api.scryfall.com/cards/TSR/69", (req, res, ctx) => {
+          return res(ctx.json({ name: "Tarmogoyf" }));
+        })
+      );
 
       const res = await get("TSR", "69");
 
