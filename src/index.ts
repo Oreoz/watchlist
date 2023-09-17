@@ -1,13 +1,13 @@
 import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { CardUpdater } from "./card-updater";
-import { wait } from "./utils";
+import { movers, wait } from "./utils";
 
 /**
  * Google API has a maximum of 60 read/writes requests per minute (1/sec).
  * Scryfall asks for a maximum of 10 calls per seconds.
  */
-const API_DELAY = 1000;
+const API_DELAY = 2000;
 
 /**
  * Since we're allowed 10 requests per seconds on Scryfall, we're going to
@@ -53,6 +53,7 @@ const doc = new GoogleSpreadsheet(
         try {
           await updater.update(currentRowIndex + i);
         } catch (error) {
+          console.warn(error);
           done = true;
           break;
         }
@@ -66,4 +67,6 @@ const doc = new GoogleSpreadsheet(
       currentRowIndex += BATCH_SIZE;
     }
   }
+
+  console.log("Done!", movers);
 })();

@@ -1,6 +1,6 @@
 import { GoogleSpreadsheetWorksheet } from "google-spreadsheet";
 import { get } from "./scryfall";
-import { determineTrend, Trend } from "./utils";
+import { determineTrend, movers, Trend } from "./utils";
 
 type Foil = "Yes" | "No" | "Etched";
 type Price = "usd_foil" | "usd" | "usd_etched";
@@ -53,15 +53,24 @@ export class CardUpdater {
     const res = await get(String(setCell.value), String(numberCell.value));
 
     if (!res.ok) {
-      throw new Error("Couldn't fetch the card data from Scryfall.");
+      throw new Error(
+        `Couldn't fetch the card data from Scryfall: ${setCell.value} ${numberCell.value}.`
+      );
     }
 
     const json = await res.json();
 
+    const currentPrice = Number(priceCell.value) ?? 0;
     const updatedPrice = Number(json.prices[prices[foilCell.value as Foil]]) ?? 0;
-    const trend = determineTrend(Number(priceCell.value), updatedPrice);
 
-    console.log(`${json.name} - ${updatedPrice} ${emojis[trend]}`);
+    const trend = determineTrend(currentPrice, updatedPrice);
+
+    console.log(`${timestamp}: ${json.name} - ${updatedPrice} ${emojis[trend]}`);
+
+    if (trend === "up") {
+      const diff = updatedPrice - currentPrice;
+      movers.push({ name: json.name, diff });
+    }
 
     if (dateCell.value !== timestamp) {
       dateCell.value = timestamp;
