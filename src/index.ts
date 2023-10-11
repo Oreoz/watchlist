@@ -6,8 +6,11 @@ import { movers, wait } from "./utils";
 /**
  * Google API has a maximum of 60 read/writes requests per minute (1/sec).
  * Scryfall asks for a maximum of 10 calls per seconds.
+ *
+ * So we'll enforce a 1.5s mandatory delay between update batches so we stay
+ * under both limits.
  */
-const API_DELAY = 2000;
+const API_DELAY = 1_500;
 
 /**
  * Since we're allowed 10 requests per seconds on Scryfall, we're going to
@@ -68,5 +71,7 @@ const doc = new GoogleSpreadsheet(
     }
   }
 
-  console.log("Done!", movers);
+  const topMovers = movers.sort((a, b) => b.diff - a.diff).slice(0, 10);
+
+  console.log("Done!", topMovers);
 })();
