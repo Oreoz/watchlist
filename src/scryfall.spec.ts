@@ -1,6 +1,6 @@
 import { get } from "./scryfall";
 import { setupServer } from "msw/node";
-import { rest } from "msw";
+import { http } from "msw";
 
 const server = setupServer();
 
@@ -14,8 +14,8 @@ describe("scryfall", () => {
   describe("get request", () => {
     it("works", async () => {
       server.use(
-        rest.get("https://api.scryfall.com/cards/TSR/69", (req, res, ctx) => {
-          return res(ctx.json({ name: "Tarmogoyf" }));
+        http.get("https://api.scryfall.com/cards/TSR/69", () => {
+          return new Response(JSON.stringify({ name: "Tarmogoyf" }));
         })
       );
 
