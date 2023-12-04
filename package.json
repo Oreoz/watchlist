@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^0.34.6",
-    "msw": "^2.0.9",
+    "msw": "^2.0.10",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
   },
