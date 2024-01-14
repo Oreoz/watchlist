@@ -4,7 +4,6 @@
   "license": "MIT",
   "description": "Tool that automatically keeps my cards prices up to date.",
   "main": "dist/index.js",
-  "type": "module",
   "engines": {
     "node": ">=20"
   },
