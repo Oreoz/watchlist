@@ -26,7 +26,7 @@
     "@vitest/coverage-v8": "^1.2.0",
     "msw": "^2.0.14",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.0"
+    "vitest": "^1.2.1"
   },
   "overrides": {
     "google-spreadsheet": {
