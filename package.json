@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@types/node": "^20.11.19",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.4",
     "google-auth-library": "^9.6.3",
     "google-spreadsheet": "^4.1.1",
     "nodemon": "^3.0.3"
