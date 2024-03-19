@@ -69,7 +69,7 @@ export class CardUpdater {
 
     if (trend === "up") {
       const diff = updatedPrice - currentPrice;
-      const percentage = diff / currentPrice;
+      const percentage = ((diff / currentPrice) * 100).toFixed(2) + "%";
       movers.push({ name: json.name, diff, percentage });
     }
 
