@@ -72,7 +72,8 @@ export class CardUpdater {
       const percentage = (diff / currentPrice) * 100;
 
       movers.push({
-        diff: diff.toFixed(2) + "$",
+        diff,
+        dollars: diff.toFixed(2) + "$",
         name: json.name,
         percentage: percentage.toFixed(2) + "%",
       });

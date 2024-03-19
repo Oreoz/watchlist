@@ -2,8 +2,9 @@ import { movers } from "./movers";
 
 beforeAll(() => {
   movers.push({
-    name: "",
-    diff: "2.12$",
+    diff: 2.1,
+    dollars: "2.10$",
+    name: "Splinter Twin",
     percentage: "4.20%",
   });
 });
