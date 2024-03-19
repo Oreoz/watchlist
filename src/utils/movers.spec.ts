@@ -3,8 +3,8 @@ import { movers } from "./movers";
 beforeAll(() => {
   movers.push({
     name: "",
-    diff: 0,
-    percentage: 0,
+    diff: "2.12$",
+    percentage: "4.20%",
   });
 });
 
