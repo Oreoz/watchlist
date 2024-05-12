@@ -8,11 +8,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
-    "build:watch": "tsc --project tsconfig.build.json --watch",
+    "build": "tsc --noEmit",
     "coverage": "vitest run --coverage",
-    "dev": "nodemon -r dotenv/config dist/index.js",
-    "start": "npm run build && node -r dotenv/config dist/index.js",
+    "start": "ts-node src/index.ts",
     "test": "vitest"
   },
   "dependencies": {
@@ -20,7 +18,7 @@
     "dotenv": "^16.4.5",
     "google-auth-library": "^9.9.0",
     "google-spreadsheet": "^4.1.1",
-    "nodemon": "^3.1.0"
+    "ts-node": "^10"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^1.6.0",
