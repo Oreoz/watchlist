@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { CardUpdater } from "./card-updater";
