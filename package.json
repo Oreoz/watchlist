@@ -14,7 +14,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@types/node": "^20.12.13",
+    "@types/node": "^20.13.0",
     "dotenv": "^16.4.5",
     "google-auth-library": "^9.10.0",
     "google-spreadsheet": "^4.1.1",
