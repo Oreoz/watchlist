@@ -9,7 +9,11 @@ A little Node script that's used to keep prices of my Magic: the Gathering colle
 
 `GOOGLE_SERVICE_ACCOUNT_EMAIL` and `GOOGLE_PRIVATE_KEY` come from the Google project you'll need to configure in the [Google Cloud Console](https://console.cloud.google.com/apis/credentials). [The docs](https://theoephraim.github.io/node-google-spreadsheet/#/guides/authentication?id=setting-up-your-quotapplicationquot) for `google-spreadsheet` goes into it quite well.
 
-`SPREADSHEET_ID` comes directly from the URL in Google Sheets.
+`SPREADSHEET_ID` comes directly from the URL in Google Sheets:
+
+```
+https://docs.google.com/spreadsheets/d/<whatever-lives-here-is-the-id>/edit
+```
 
 3. Install dependencies via `npm i`
 4. Start the script via `npm start`
