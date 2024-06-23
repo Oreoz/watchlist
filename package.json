@@ -23,7 +23,7 @@
   "devDependencies": {
     "@vitest/coverage-v8": "^1",
     "msw": "^2",
-    "typescript": "~5.4",
+    "typescript": "~5.5",
     "vitest": "^1"
   },
   "overrides": {
