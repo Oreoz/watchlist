@@ -18,7 +18,7 @@ const API_DELAY = 1_500;
  * update prices in 10 card chunks to not exceed the 1 request per second
  * limit on the Google Sheets API.
  */
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 20;
 
 /**
  * Create the google service account credentials that we'll use in order
