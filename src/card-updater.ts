@@ -73,9 +73,9 @@ export class CardUpdater {
 
       movers.push({
         diff,
-        dollars: diff.toFixed(2) + "$",
         name: json.name,
-        percentage: percentage.toFixed(2) + "%",
+        percentage: percentage,
+        price: updatedPrice,
       });
     }
 

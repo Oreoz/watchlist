@@ -72,7 +72,17 @@ const doc = new GoogleSpreadsheet(
     }
   }
 
-  const topMovers = movers.sort((a, b) => b.diff - a.diff).slice(0, 10);
+  // Take the cards that move in order to determine the top 10
+  // movers based on price difference and format them for final output.
+  const topMovers = movers
+    .sort((a, b) => b.diff - a.diff)
+    .slice(0, 10)
+    .map((m) => ({
+      name: m.name,
+      dollars: m.diff.toFixed(2) + "$",
+      percentage: m.percentage.toFixed(2) + "%",
+      price: m.price.toFixed(2) + "$",
+    }));
 
   console.log("Done!", topMovers);
 })();

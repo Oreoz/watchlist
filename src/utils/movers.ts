@@ -1,8 +1,8 @@
 export type Mover = {
   diff: number;
-  dollars: string;
   name: string;
-  percentage: string;
+  percentage: number;
+  price: number;
 };
 
 /**
