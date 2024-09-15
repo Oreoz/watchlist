@@ -3,9 +3,9 @@ import { movers } from "./movers";
 beforeAll(() => {
   movers.push({
     diff: 2.1,
-    dollars: "2.10$",
     name: "Splinter Twin",
-    percentage: "4.20%",
+    percentage: 4.2,
+    price: 69,
   });
 });
 
