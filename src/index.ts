@@ -7,18 +7,15 @@ import { movers, wait } from "./utils";
 /**
  * Google API has a maximum of 60 read/writes requests per minute (1/sec).
  * Scryfall asks for a maximum of 10 calls per seconds.
- *
- * So we'll enforce a 1.5s mandatory delay between update batches so we stay
- * under both limits.
  */
-const API_DELAY = 1_500;
+const SHEETS_API_DELAY = 3_000;
 
 /**
  * Since we're allowed 10 requests per seconds on Scryfall, we're going to
- * update prices in 10 card chunks to not exceed the 1 request per second
- * limit on the Google Sheets API.
+ * update prices in 10 card chunks for every second of API delay we introduce
+ * to not exceed the 1 request per second limit on the Google Sheets API.
  */
-const BATCH_SIZE = 20;
+const BATCH_SIZE = SHEETS_API_DELAY / 100;
 
 /**
  * Create the google service account credentials that we'll use in order
@@ -48,7 +45,7 @@ const doc = new GoogleSpreadsheet(
     let done = false;
 
     while (!done) {
-      const sheetsThrottle = wait(API_DELAY);
+      const sheetsThrottle = wait(SHEETS_API_DELAY);
       await sheet.loadCells(`A${currentRowIndex}:H${currentRowIndex + BATCH_SIZE}`);
 
       const updater = new CardUpdater(sheet);
