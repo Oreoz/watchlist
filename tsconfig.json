@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "commonjs",
-    "strict": true,
     "esModuleInterop": true,
+    "noEmit": true,
+    "module": "commonjs",
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "dist",
+    "strict": true,
+    "target": "ESNext",
     "types": ["vitest/globals"]
   },
   "exclude": ["node_modules"]
