@@ -74,12 +74,9 @@ const doc = new GoogleSpreadsheet(
   const topMovers = movers
     .sort((a, b) => b.diff - a.diff)
     .slice(0, 10)
-    .map((m) => ({
-      name: m.name,
-      dollars: m.diff.toFixed(2) + "$",
-      percentage: m.percentage.toFixed(2) + "%",
-      price: m.price.toFixed(2) + "$",
-    }));
+    .map(({ name, percentage, price }) => {
+      return `${name} ${price.toFixed(2)}$ (${percentage.toFixed(2)}%)`;
+    });
 
-  console.log("Done!", topMovers);
+  console.log(topMovers.join("\n"));
 })();

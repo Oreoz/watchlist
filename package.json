@@ -4,31 +4,27 @@
   "license": "MIT",
   "description": "Tool that automatically keeps my cards prices up to date.",
   "main": "dist/index.js",
+  "type": "module",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "tsc --noEmit",
     "coverage": "vitest run --coverage",
-    "start": "ts-node src/index.ts",
+    "start": "tsx src/index.ts",
     "test": "vitest"
   },
   "dependencies": {
-    "@types/node": "^22.10.2",
-    "dotenv": "^16.4.7",
-    "google-auth-library": "^9.15.0",
-    "google-spreadsheet": "^4.1.4",
-    "ts-node": "^10"
+    "@types/node": "^22",
+    "dotenv": "^16",
+    "google-auth-library": "^9",
+    "google-spreadsheet": "^4",
+    "tsx": "^4"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2",
     "msw": "^2",
     "typescript": "~5.7",
     "vitest": "^2"
-  },
-  "overrides": {
-    "google-spreadsheet": {
-      "google-auth-library": "^9.0.0"
-    }
   }
 }
