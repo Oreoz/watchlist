@@ -1,6 +1,6 @@
 import { GoogleSpreadsheetWorksheet } from "google-spreadsheet";
 import { get } from "./scryfall";
-import { determineTrend, movers, Trend } from "./utils";
+import { bump, determineTrend, movers, Trend } from "./utils";
 
 type Foil = "Yes" | "No" | "Etched";
 type Price = "usd_foil" | "usd" | "usd_etched";
@@ -9,12 +9,6 @@ const prices: Record<Foil, Price> = {
   Yes: "usd_foil",
   No: "usd",
   Etched: "usd_etched",
-};
-
-const emojis: Record<Trend, string> = {
-  up: "📈",
-  down: "📉",
-  same: "✋",
 };
 
 const Rows = {
@@ -84,5 +78,7 @@ export class CardUpdater {
 
     nameCell.value = json.name;
     priceCell.value = updatedPrice;
+
+    bump();
   }
 }

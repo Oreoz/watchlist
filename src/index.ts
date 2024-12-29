@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { CardUpdater } from "./card-updater";
-import { movers, wait } from "./utils";
 import ora from "ora";
+import { CardUpdater } from "./card-updater";
+import { printTopMovers, updated, wait } from "./utils";
 
 /**
  * Google API has a maximum of 60 read/writes requests per minute (1/sec).
@@ -38,21 +38,22 @@ const doc = new GoogleSpreadsheet(
 );
 
 (async () => {
-  const spinner = ora("Updating card prices").start();
+  const spinner = ora("Updating prices").start();
 
   await doc.loadInfo();
 
   for (let sheetIndex = 0; sheetIndex < doc.sheetCount; sheetIndex++) {
-    spinner.suffixText = `working on sheet #${sheetIndex + 1}`;
-    const sheet = doc.sheetsByIndex[sheetIndex];
+    const worksheet = doc.sheetsByIndex[sheetIndex];
     let currentRowIndex = 1;
     let done = false;
 
-    while (!done) {
-      const sheetsThrottle = wait(SHEETS_API_DELAY);
-      await sheet.loadCells(`A${currentRowIndex}:H${currentRowIndex + BATCH_SIZE}`);
+    const updater = new CardUpdater(worksheet);
 
-      const updater = new CardUpdater(sheet);
+    while (!done) {
+      spinner.suffixText = `(${updated} cards processed)`;
+
+      const sheetsThrottle = wait(SHEETS_API_DELAY);
+      await worksheet.loadCells(`A${currentRowIndex}:H${currentRowIndex + BATCH_SIZE}`);
 
       for (let i = 0; i < BATCH_SIZE; i++) {
         try {
@@ -63,7 +64,7 @@ const doc = new GoogleSpreadsheet(
         }
       }
 
-      await sheet.saveUpdatedCells();
+      await worksheet.saveUpdatedCells();
       await sheetsThrottle;
 
       if (done) break;
@@ -72,17 +73,7 @@ const doc = new GoogleSpreadsheet(
     }
   }
 
-  // Take the cards that move in order to determine the top 10
-  // movers based on price difference and format them for final output.
-  const topMovers = movers
-    .sort((a, b) => b.diff - a.diff)
-    .slice(0, 10)
-    .map(({ name, percentage, price }) => {
-      return `${name} ${price.toFixed(2)}$ (${percentage.toFixed(2)}%)`;
-    });
+  spinner.succeed("Done updating prices.");
 
-  spinner.suffixText = "";
-  spinner.succeed("Done updating card prices.");
-
-  console.log(topMovers.join("\n"));
+  printTopMovers();
 })();
