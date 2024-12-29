@@ -65,8 +65,6 @@ export class CardUpdater {
 
     const trend = determineTrend(currentPrice, updatedPrice);
 
-    console.log(`${timestamp}: ${json.name} - ${updatedPrice} ${emojis[trend]}`);
-
     if (trend === "up") {
       const diff = updatedPrice - currentPrice;
       const percentage = (diff / currentPrice) * 100;

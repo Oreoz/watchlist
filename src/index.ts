@@ -3,6 +3,7 @@ import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { CardUpdater } from "./card-updater";
 import { movers, wait } from "./utils";
+import ora from "ora";
 
 /**
  * Google API has a maximum of 60 read/writes requests per minute (1/sec).
@@ -37,9 +38,12 @@ const doc = new GoogleSpreadsheet(
 );
 
 (async () => {
+  const spinner = ora("Updating card prices").start();
+
   await doc.loadInfo();
 
   for (let sheetIndex = 0; sheetIndex < doc.sheetCount; sheetIndex++) {
+    spinner.suffixText = `working on sheet #${sheetIndex + 1}`;
     const sheet = doc.sheetsByIndex[sheetIndex];
     let currentRowIndex = 1;
     let done = false;
@@ -54,7 +58,6 @@ const doc = new GoogleSpreadsheet(
         try {
           await updater.update(currentRowIndex + i);
         } catch (error) {
-          console.warn(error);
           done = true;
           break;
         }
@@ -77,6 +80,9 @@ const doc = new GoogleSpreadsheet(
     .map(({ name, percentage, price }) => {
       return `${name} ${price.toFixed(2)}$ (${percentage.toFixed(2)}%)`;
     });
+
+  spinner.suffixText = "";
+  spinner.succeed("Done updating card prices.");
 
   console.log(topMovers.join("\n"));
 })();

@@ -15,6 +15,7 @@
     "dotenv": "^16",
     "google-auth-library": "^9",
     "google-spreadsheet": "^4",
+    "ora": "^8",
     "tsx": "^4"
   },
   "devDependencies": {
