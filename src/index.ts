@@ -6,17 +6,23 @@ import { CardUpdater } from "./card-updater";
 import { printTopMovers, updated, wait } from "./utils";
 
 /**
- * Google API has a maximum of 60 read/writes requests per minute (1/sec).
- * Scryfall asks for a maximum of 10 calls per seconds.
+ * We kindly ask that you insert 50 – 100 milliseconds of delay
+ * between the requests you send to the server at api.scryfall.com.
+ *
+ * See https://scryfall.com/docs/api
  */
-const SHEETS_API_DELAY = 3_000;
+const SCRYFALL_API_DELAY = 75;
 
 /**
- * Since we're allowed 10 requests per seconds on Scryfall, we're going to
- * update prices in 10 card chunks for every second of API delay we introduce
- * to not exceed the 1 request per second limit on the Google Sheets API.
+ * Google API has a maximum of 60 read/writes reqs per minute (1/sec).
  */
-const BATCH_SIZE = SHEETS_API_DELAY / 100;
+const SHEETS_API_DELAY = 1_000;
+
+/**
+ * Determine how many calls to Scryfall we should do prior to "flushing"
+ * out data to the spreadsheet.
+ */
+const BATCH_SIZE = Math.ceil(SHEETS_API_DELAY / SCRYFALL_API_DELAY);
 
 /**
  * Create the google service account credentials that we'll use in order
@@ -52,12 +58,12 @@ const doc = new GoogleSpreadsheet(
     while (!done) {
       spinner.suffixText = `(${updated} cards processed)`;
 
-      const sheetsThrottle = wait(SHEETS_API_DELAY);
       await worksheet.loadCells(`A${currentRowIndex}:H${currentRowIndex + BATCH_SIZE}`);
 
       for (let i = 0; i < BATCH_SIZE; i++) {
         try {
           await updater.update(currentRowIndex + i);
+          await wait(SCRYFALL_API_DELAY); // Throttle in between Scryfall API calls.
         } catch (error) {
           done = true;
           break;
@@ -65,7 +71,6 @@ const doc = new GoogleSpreadsheet(
       }
 
       await worksheet.saveUpdatedCells();
-      await sheetsThrottle;
 
       if (done) break;
 
