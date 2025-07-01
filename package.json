@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@types/node": "^24",
-    "dotenv": "^16",
+    "dotenv": "^17",
     "google-auth-library": "^9",
     "google-spreadsheet": "^4",
     "ora": "^8",
