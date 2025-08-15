@@ -5,13 +5,19 @@ import ora from "ora";
 import { CardUpdater } from "./card-updater";
 import { printTopMovers, updated, wait } from "./utils";
 
+const {
+  GOOGLE_PRIVATE_KEY,
+  GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  SPREADSHEET_ID = "",
+} = process.env;
+
 /**
  * We kindly ask that you insert 50 – 100 milliseconds of delay
  * between the requests you send to the server at api.scryfall.com.
  *
  * See https://scryfall.com/docs/api
  */
-const SCRYFALL_API_DELAY = 75;
+const SCRYFALL_API_DELAY = 50;
 
 /**
  * Google API has a maximum of 60 read/writes reqs per minute (1/sec).
@@ -24,32 +30,24 @@ const SHEETS_API_DELAY = 1_000;
  */
 const BATCH_SIZE = Math.ceil(SHEETS_API_DELAY / SCRYFALL_API_DELAY);
 
-/**
- * Create the google service account credentials that we'll use in order
- * to acces our spreadsheet. This leverages information that we store in
- * our .env file.
- */
-const serviceAccountCredentials = new JWT({
-  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-  key: process.env.GOOGLE_PRIVATE_KEY,
+const jwt = new JWT({
+  email: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  key: GOOGLE_PRIVATE_KEY,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
 /**
  * The spreadsheet that we will be manipulating during this script.
  */
-const doc = new GoogleSpreadsheet(
-  process.env.SPREADSHEET_ID ?? "",
-  serviceAccountCredentials
-);
+const spreadsheet = new GoogleSpreadsheet(SPREADSHEET_ID, jwt);
 
 (async () => {
   const spinner = ora("Updating prices").start();
 
-  await doc.loadInfo();
+  await spreadsheet.loadInfo();
 
-  for (let sheetIndex = 0; sheetIndex < doc.sheetCount; sheetIndex++) {
-    const worksheet = doc.sheetsByIndex[sheetIndex];
+  for (let sheetIndex = 0; sheetIndex < spreadsheet.sheetCount; sheetIndex++) {
+    const worksheet = spreadsheet.sheetsByIndex[sheetIndex];
     let currentRowIndex = 1;
     let done = false;
 

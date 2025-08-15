@@ -1,6 +1,6 @@
 import { GoogleSpreadsheetWorksheet } from "google-spreadsheet";
 import { get } from "./scryfall";
-import { bump, determineTrend, movers, Trend } from "./utils";
+import { bump, determineTrend, movers } from "./utils";
 
 type Foil = "Yes" | "No" | "Etched";
 type Price = "usd_foil" | "usd" | "usd_etched";
