@@ -12,15 +12,14 @@ const {
 } = process.env;
 
 /**
- * We kindly ask that you insert 50 – 100 milliseconds of delay
- * between the requests you send to the server at api.scryfall.com.
+ * CONSTRAINT: API calls are limited to ~10/seconds.
  *
- * See https://scryfall.com/docs/api
+ * See https://scryfall.com/docs/api/rate-limits
  */
 const SCRYFALL_API_DELAY = 50;
 
 /**
- * Google API has a maximum of 60 read/writes reqs per minute (1/sec).
+ * CONSTRAINT: Google API has a maximum of 60 read/writes reqs per minute (1/sec).
  */
 const SHEETS_API_DELAY = 1_000;
 
