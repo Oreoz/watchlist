@@ -13,10 +13,14 @@ describe("scryfall", () => {
 
   describe("get request", () => {
     it("works", async () => {
+      expect.assertions(4);
+
       server.use(
-        http.get("https://api.scryfall.com/cards/TSR/69", () => {
+        http.get("https://api.scryfall.com/cards/tsr/69", ({ request }) => {
+          expect(request.headers.get("Accept")).toBe("application/json");
+          expect(request.headers.get("User-Agent")).toBe("Watchlist/1.0");
           return new Response(JSON.stringify({ name: "Tarmogoyf" }));
-        })
+        }),
       );
 
       const res = await get("TSR", "69");

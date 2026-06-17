@@ -12,5 +12,10 @@
 export async function get(set: string, number: string) {
   const normalizedSet = set.toLowerCase();
 
-  return await fetch(`https://api.scryfall.com/cards/${normalizedSet}/${number}`);
+  return await fetch(`https://api.scryfall.com/cards/${normalizedSet}/${number}`, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "Watchlist/1.0",
+    },
+  });
 }
