@@ -7,6 +7,9 @@ export default defineConfig({
       reporter: ["text", "json-summary", "json"],
       reportOnFailure: true,
     },
+    env: {
+      NODE_OPTIONS: "--no-webstorage",
+    },
     globals: true,
   },
 });
