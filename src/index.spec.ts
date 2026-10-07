@@ -34,9 +34,15 @@ describe("index entrypoint", () => {
     };
 
     const jwt = {};
-    const JWT = vi.fn().mockImplementation(() => jwt);
-    const GoogleSpreadsheet = vi.fn().mockImplementation(() => spreadsheet);
-    const CardUpdater = vi.fn().mockImplementation(() => ({ update }));
+    const JWT = vi.fn().mockImplementation(function () {
+      return jwt;
+    });
+    const GoogleSpreadsheet = vi.fn().mockImplementation(function () {
+      return spreadsheet;
+    });
+    const CardUpdater = vi.fn().mockImplementation(function () {
+      return { update };
+    });
     const wait = vi.fn().mockResolvedValue(undefined);
     const printTopMovers = vi.fn();
 
@@ -91,8 +97,7 @@ describe("index entrypoint", () => {
 
   afterEach(() => {
     process.env.GOOGLE_PRIVATE_KEY = originalEnv.GOOGLE_PRIVATE_KEY;
-    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL =
-      originalEnv.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = originalEnv.GOOGLE_SERVICE_ACCOUNT_EMAIL;
     process.env.SPREADSHEET_ID = originalEnv.SPREADSHEET_ID;
   });
 });
