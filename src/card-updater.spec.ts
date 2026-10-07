@@ -188,6 +188,112 @@ describe("CardUpdater", () => {
     },
   );
 
+  it("records a downward trend without adding a mover", async () => {
+    const { worksheet, getCell } = createWorksheet({
+      [Columns.foil]: "No",
+      [Columns.set]: "TSR",
+      [Columns.number]: "69",
+      [Columns.price]: "15",
+      [Columns.date]: "2025-01-01",
+      [Columns.trend]: "up",
+    });
+
+    mockedGet.mockResolvedValue(
+      createResponse(true, {
+        name: "Tarmogoyf",
+        prices: {
+          usd: "12",
+          usd_foil: "15",
+          usd_etched: "13",
+        },
+      }),
+    );
+
+    await new CardUpdater(worksheet).update(1);
+
+    expect(getCell(Columns.price).value).toBe(12);
+    expect(getCell(Columns.trend).value).toBe("down");
+    expect(movers).toHaveLength(0);
+  });
+
+  it("handles missing Scryfall price data gracefully", async () => {
+    const { worksheet, getCell } = createWorksheet({
+      [Columns.foil]: "No",
+      [Columns.set]: "TSR",
+      [Columns.number]: "69",
+      [Columns.price]: "10",
+      [Columns.date]: "2025-01-01",
+    });
+
+    mockedGet.mockResolvedValue(
+      createResponse(true, {
+        name: "Tarmogoyf",
+        prices: {},
+      }),
+    );
+
+    await new CardUpdater(worksheet).update(1);
+
+    expect(getCell(Columns.price).value).toBe(0);
+    expect(getCell(Columns.trend).value).toBe("down");
+    expect(movers).toHaveLength(0);
+  });
+
+  it("handles zero current price without producing NaN percentage", async () => {
+    const today = new Date().toLocaleDateString("en-CA");
+    const { worksheet, getCell } = createWorksheet({
+      [Columns.foil]: "No",
+      [Columns.set]: "TSR",
+      [Columns.number]: "69",
+      [Columns.price]: "0",
+      [Columns.date]: "2025-01-01",
+    });
+
+    mockedGet.mockResolvedValue(
+      createResponse(true, {
+        name: "Tarmogoyf",
+        prices: {
+          usd: "5",
+          usd_foil: "15",
+          usd_etched: "13",
+        },
+      }),
+    );
+
+    await new CardUpdater(worksheet).update(1);
+
+    expect(getCell(Columns.price).value).toBe(5);
+    expect(getCell(Columns.trend).value).toBe("up");
+    expect(movers).toHaveLength(1);
+    expect(movers[0].percentage).toBe(0);
+    expect(getCell(Columns.date).value).toBe(today);
+  });
+
+  it("throws when foil value is invalid", async () => {
+    const { worksheet } = createWorksheet({
+      [Columns.foil]: "Invalid",
+      [Columns.set]: "TSR",
+      [Columns.number]: "69",
+      [Columns.price]: "10",
+      [Columns.date]: "2025-01-01",
+    });
+
+    mockedGet.mockResolvedValue(
+      createResponse(true, {
+        name: "Tarmogoyf",
+        prices: {
+          usd: "10",
+          usd_foil: "15",
+          usd_etched: "13",
+        },
+      }),
+    );
+
+    await expect(new CardUpdater(worksheet).update(1)).rejects.toThrow(
+      "Invalid foil value: Invalid",
+    );
+  });
+
   it("handles malformed current prices without throwing", async () => {
     const { worksheet, getCell } = createWorksheet({
       [Columns.foil]: "No",
@@ -210,7 +316,7 @@ describe("CardUpdater", () => {
 
     await expect(new CardUpdater(worksheet).update(1)).resolves.toBeUndefined();
     expect(getCell(Columns.price).value).toBe(10);
-    expect(getCell(Columns.trend).value).toBe("same");
-    expect(movers).toHaveLength(0);
+    expect(getCell(Columns.trend).value).toBe("up");
+    expect(movers).toHaveLength(1);
   });
 });
