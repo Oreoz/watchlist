@@ -2,14 +2,14 @@ import { GoogleSpreadsheetWorksheet } from "google-spreadsheet";
 import { get } from "./scryfall";
 import { bump, determineTrend, movers } from "./utils";
 
-type Foil = "Yes" | "No" | "Etched";
-type Price = "usd_foil" | "usd" | "usd_etched";
-
-const prices: Record<Foil, Price> = {
+const prices = {
   Yes: "usd_foil",
   No: "usd",
   Etched: "usd_etched",
-};
+} as const;
+
+type Foil = keyof typeof prices;
+type Price = (typeof prices)[Foil];
 
 const Rows = {
   name: 0,
@@ -23,6 +23,9 @@ const Rows = {
 };
 
 const timestamp = new Date().toLocaleDateString("en-CA");
+
+const isFoil = (value: unknown): value is Foil =>
+  typeof value === "string" && Object.prototype.hasOwnProperty.call(prices, value);
 
 export class CardUpdater {
   worksheet: GoogleSpreadsheetWorksheet;
@@ -54,19 +57,27 @@ export class CardUpdater {
 
     const json = await res.json();
 
-    const currentPrice = Number(priceCell.value) ?? 0;
-    const updatedPrice = Number(json.prices[prices[foilCell.value as Foil]]) ?? 0;
+    const currentPriceRaw = Number(priceCell.value);
+    const currentPrice = Number.isFinite(currentPriceRaw) ? currentPriceRaw : 0;
+
+    const foilValue = foilCell.value;
+    if (!isFoil(foilValue)) {
+      throw new Error(`Invalid foil value: ${String(foilValue)}`);
+    }
+
+    const updatedPriceRaw = Number(json.prices[prices[foilValue]]);
+    const updatedPrice = Number.isFinite(updatedPriceRaw) ? updatedPriceRaw : 0;
 
     const trend = determineTrend(currentPrice, updatedPrice);
 
     if (trend === "up") {
       const diff = updatedPrice - currentPrice;
-      const percentage = (diff / currentPrice) * 100;
+      const percentage = currentPrice > 0 ? (diff / currentPrice) * 100 : 0;
 
       movers.push({
         diff,
         name: json.name,
-        percentage: percentage,
+        percentage,
         price: updatedPrice,
       });
     }
