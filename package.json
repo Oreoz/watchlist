@@ -19,9 +19,9 @@
     "tsx": "^4"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4",
+    "@vitest/coverage-v8": "^5",
     "msw": "^2",
     "typescript": "~7.0",
-    "vitest": "^4"
+    "vitest": "^5"
   }
 }
